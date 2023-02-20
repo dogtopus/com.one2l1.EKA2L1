@@ -1,0 +1,55 @@
+app-id: 'com.one2l1.EKA2L1'
+runtime: 'org.kde.Platform'
+runtime-version: '5.15-22.08'
+sdk: 'org.kde.Sdk'
+command: 'eka2l1_qt'
+rename-icon: duck_tank
+rename-desktop-file: eka2l1.desktop
+
+finish-args:
+  # Controller access
+  - --device=all
+  # X11 + XShm access
+  - --share=ipc
+  - --socket=x11
+  # Wayland access
+  - --socket=wayland
+  # Audio
+  - --socket=pulseaudio
+  # Needs to talk to the network:
+  - --share=network
+
+modules:
+  # CSD is handled by Qt and not SDL so we don't need libdecor here.
+  - 'shared-modules/SDL2/SDL2-no-libdecor.json'
+  - name: 'EKA2L1'
+    buildsystem: cmake-ninja
+    # Required for some subprojects
+    builddir: true
+    # Install target is broken and will attempt to install garbage.
+    no-make-install: true
+    post-install:
+      - 'mkdir -p /app/share/applications/'
+      - 'mkdir -p /app/share/icons/hicolor/256x256/apps/'
+      - 'install -m644 bin/eka2l1.desktop /app/share/applications/eka2l1.desktop'
+      - 'install -m644 bin/duck_tank.png /app/share/icons/hicolor/256x256/apps/'
+      - 'install -m755 ../eka2l1.sh /app/bin/eka2l1_qt'
+      - 'cp -r bin /app/lib/eka2l1'
+    config-opts:
+      - -DEKA2L1_ENABLE_UNEXPECTED_EXCEPTION_HANDLER=ON
+      - -DEKA2L1_NO_TERMINAL=ON
+      - -DEKA2L1_BUILD_TOOLS=OFF
+      - -DEKA2L1_BUILD_TESTS=OFF
+      - -DCMAKE_BUILD_TYPE=Release
+    sources:
+      - type: git
+        url: 'https://github.com/EKA2L1/EKA2L1.git'
+        commit: 'aacb3271b27ebd959850f92814e9907fa08b1789'
+      # chdir wrapper
+      - type: file
+        path: 'eka2l1.sh'
+      # HACK
+      - type: patch
+        path: '0001-disable-mbedtls-programs.diff'
+        use-git: true
+

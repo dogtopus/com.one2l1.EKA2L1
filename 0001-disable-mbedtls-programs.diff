@@ -1,0 +1,12 @@
+diff --git a/src/external/CMakeLists.txt b/src/external/CMakeLists.txt
+index 2ee5e9b26..2f30dcf7b 100644
+--- a/src/external/CMakeLists.txt
++++ b/src/external/CMakeLists.txt
+@@ -215,6 +215,7 @@ add_subdirectory(libfat)
+ 
+ # mbedtls
+ set(ENABLE_TESTING OFF CACHE BOOL "Build mbed TLS tests." FORCE)
++set(ENABLE_PROGRAMS OFF CACHE BOOL "Build mbed TLS programs." FORCE)
+ add_subdirectory(mbedtls)
+ 
+ # SQLite3
